@@ -1,0 +1,84 @@
+---
+- name: Adding HP Management Component Pack repo and install hp proliant tools
+  hosts: proliant-servers
+  gather_facts: true
+  become: true
+  tasks:
+    - name: Add an Apt signing hp Public Keys
+      ansible.builtin.apt_key:
+        url: "{{ item }}"
+        state: present
+      loop:
+        - "https://downloads.linux.hpe.com/SDR/hpPublicKey2048.pub"
+        - "https://downloads.linux.hpe.com/SDR/hpPublicKey2048_key1.pub"
+        - "https://downloads.linux.hpe.com/SDR/hpePublicKey2048_key1.pub"
+      when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
+    - name: Add an apt LINBIT Package and Repository Signing Key (2023)
+      ansible.builtin.apt_key:
+        keyserver: keyserver.ubuntu.com
+        id: 53B3B037282B6E23
+      when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
+    - name: Latest HPE Management Component Pack repo for the exact OS release
+      ansible.builtin.apt_repository:
+        # yamllint disable-line rule:line-length
+        repo: "deb http://downloads.linux.hpe.com/SDR/repo/mcp {{ ansible_facts['lsb']['codename'] }}/current non-free"
+        filename: mcp
+        state: present
+        update_cache: true
+      when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
+    - name: HPE Management Component Pack repo add to Ubuntu bionic and focal
+      ansible.builtin.apt_repository:
+        # yamllint disable-line rule:line-length
+        repo: "deb http://downloads.linux.hpe.com/SDR/repo/mcp bionic/10.80 non-free"
+        filename: mcp-focal
+        state: present
+        update_cache: true
+      # yamllint disable-line rule:line-length
+      when: ansible_distribution == 'Ubuntu' and ansible_distribution_release == 'focal' or ansible_distribution_release == 'bionic'
+
+    - name: HPE Management Component Pack repo add to Debian jessie and bullseye
+      ansible.builtin.apt_repository:
+        # yamllint disable-line rule:line-length
+        repo: "deb http://downloads.linux.hpe.com/SDR/repo/mcp jessie/current non-free"
+        filename: mcp-jessie
+        state: present
+        update_cache: true
+      # yamllint disable-line rule:line-length
+      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'bullseye' or ansible_distribution_release == 'jessie'
+
+    - name: Copy dummy .deb package
+      ansible.builtin.copy:
+        src: lib32gcc1_1.0_all.deb
+        dest: /tmp/
+        owner: root
+        group: root
+        mode: '0644'
+      # yamllint disable-line rule:line-length
+      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'bullseye'
+    - name: Install dummy .deb package
+      ansible.builtin.apt:
+        deb: /tmp/lib32gcc1_1.0_all.deb
+      # yamllint disable-line rule:line-length
+      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'bullseye'
+    - name: Delete /tmp/lib32gcc1_1.0_all.deb
+      ansible.builtin.file:
+        path: /tmp/lib32gcc1_1.0_all.deb
+        state: absent
+      # yamllint disable-line rule:line-length
+      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'bullseye'
+
+    - name: install hp-health
+      ansible.builtin.package:
+        name:
+          - hp-health
+          - storcli
+          - ssacli
+        state: present
+      when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
+    - name: Cleanup apt cache.
+      apt:
+        autoclean: true
