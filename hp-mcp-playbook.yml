@@ -9,7 +9,6 @@
         url: "{{ item }}"
         state: present
       loop:
-        - "https://downloads.linux.hpe.com/SDR/hpPublicKey2048.pub"
         - "https://downloads.linux.hpe.com/SDR/hpPublicKey2048_key1.pub"
         - "https://downloads.linux.hpe.com/SDR/hpePublicKey2048_key1.pub"
       when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
