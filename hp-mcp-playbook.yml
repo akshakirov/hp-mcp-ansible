@@ -4,26 +4,37 @@
   gather_facts: true
   become: true
   tasks:
-    - name: Add an Apt signing hp Public Keys
-      ansible.builtin.apt_key:
-        url: "{{ item }}"
-        state: present
-      loop:
-        - "https://downloads.linux.hpe.com/SDR/hpPublicKey2048_key1.pub"
-        - "https://downloads.linux.hpe.com/SDR/hpePublicKey2048_key1.pub"
+    - name: Add an Apt signing hp Public Key
+      ansible.builtin.get_url:
+        url: "https://downloads.linux.hpe.com/SDR/hpePublicKey2048_key2.pub"
+        dest: "/etc/apt/trusted.gpg.d/hpePublicKey2048_key2.asc"
+        mode: '0644'
+        force: true
       when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
 
-    - name: Add an apt LINBIT Package and Repository Signing Key (2023)
-      ansible.builtin.apt_key:
-        keyserver: keyserver.ubuntu.com
-        id: 53B3B037282B6E23
+    - name: Add an Apt signing hp Public Key
+      ansible.builtin.get_url:
+        url: "https://downloads.linux.hpe.com/SDR/hpePublicKey2048_key1.pub"
+        dest: "/etc/apt/trusted.gpg.d/hpePublicKey2048_key1.asc"
+        mode: '0644'
+        force: true
       when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
+    - name: Non-free firmware moved to its own component in the archive
+      ansible.builtin.copy:
+        src: no-bookworm-firmware.conf
+        dest: /etc/apt/apt.conf.d/
+        owner: root
+        group: root
+        mode: '0644'
+      # yamllint disable-line rule:line-length
+      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'bullseye'
 
     - name: Latest HPE Management Component Pack repo for the exact OS release
       ansible.builtin.apt_repository:
         # yamllint disable-line rule:line-length
-        repo: "deb http://downloads.linux.hpe.com/SDR/repo/mcp {{ ansible_facts['lsb']['codename'] }}/current non-free"
-        filename: mcp
+        repo: "deb [arch=amd64 signed-by=/etc/apt/trusted.gpg.d/hpePublicKey2048_key1.asc] http://downloads.linux.hpe.com/SDR/repo/mcp {{ ansible_distribution_release }}/current non-free"
+        filename: hp-mcp
         state: present
         update_cache: true
       when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
@@ -32,7 +43,7 @@
       ansible.builtin.apt_repository:
         # yamllint disable-line rule:line-length
         repo: "deb http://downloads.linux.hpe.com/SDR/repo/mcp bionic/10.80 non-free"
-        filename: mcp-focal
+        filename: hp-mcp-focal
         state: present
         update_cache: true
       # yamllint disable-line rule:line-length
@@ -42,7 +53,7 @@
       ansible.builtin.apt_repository:
         # yamllint disable-line rule:line-length
         repo: "deb http://downloads.linux.hpe.com/SDR/repo/mcp jessie/current non-free"
-        filename: mcp-jessie
+        filename: hp-mcp-jessie
         state: present
         update_cache: true
       # yamllint disable-line rule:line-length
@@ -69,12 +80,39 @@
       # yamllint disable-line rule:line-length
       when: ansible_distribution == 'Debian' and ansible_distribution_release == 'bullseye'
 
+   - name: Copy hp-health package
+     ansible.builtin.copy:
+        src: hp-health_10.80-1874.10_amd64_mod.deb
+        dest: /tmp/
+        owner: root
+        group: root
+        mode: '0644'
+      # yamllint disable-line rule:line-length
+      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'bullseye'
+    - name: Install hp-health package
+      ansible.builtin.apt:
+        deb: /tmp/hp-health_10.80-1874.10_amd64_mod.deb
+      # yamllint disable-line rule:line-length
+      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'bullseye'
+    - name: Delete /tmp/hp-health_10.80-1874.10_amd64_mod.deb
+      ansible.builtin.file:
+        path: /tmp/hp-health_10.80-1874.10_amd64_mod.deb
+        state: absent
+      # yamllint disable-line rule:line-length
+      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'bullseye'
+
+    - name: Install hp-ams
+      ansible.builtin.apt:
+        deb: https://downloads.linux.hpe.com/SDR/repo/mcp/Debian/pool/non-free/hp-ams_2.6.2-2551.13_amd64.deb
+
     - name: install hp-health
       ansible.builtin.package:
         name:
-          - hp-health
+          - amsd
           - storcli
           - ssacli
+          - ssa
+          - ssaducli
         state: present
       when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
 
