@@ -80,8 +80,8 @@
       # yamllint disable-line rule:line-length
       when: ansible_distribution == 'Debian' and ansible_distribution_release == 'bullseye'
 
-   - name: Copy hp-health package
-     ansible.builtin.copy:
+    - name: Copy hp-health package
+      ansible.builtin.copy:
         src: hp-health_10.80-1874.10_amd64_mod.deb
         dest: /tmp/
         owner: root
