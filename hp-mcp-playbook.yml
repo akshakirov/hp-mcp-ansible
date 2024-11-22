@@ -4,6 +4,14 @@
   gather_facts: true
   become: true
   tasks:
+    - name: Del older mcp repo
+      ansible.builtin.file:
+        path: '{{ item }}'
+        state: absent
+      loop:
+        - /etc/apt/sources.list.d/mcp.list
+        - /etc/apt/sources.list.d/mcp-jessie.list
+
     - name: Add an Apt signing hp Public Key
       ansible.builtin.get_url:
         url: "https://downloads.linux.hpe.com/SDR/hpePublicKey2048_key2.pub"
