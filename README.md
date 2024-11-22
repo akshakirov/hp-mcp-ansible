@@ -18,83 +18,6 @@
  hplog -p
 ```
 
-```ssacli ctrl slot=0 ld all show detail```
-
-Smart Array P420i in Slot 0 (Embedded)
-
-   Array A
-
-      Logical Drive: 1
-         Size: 838.33 GB
-         Fault Tolerance: 1
-         Heads: 255
-         Sectors Per Track: 32
-         Cylinders: 65535
-         Strip Size: 256 KB
-         Full Stripe Size: 256 KB
-         Status: OK
-         Unrecoverable Media Errors: None
-         Caching:  Enabled
-         Unique Identifier: 600508B1001CD326DDB697BAB5900BC9
-         Disk Name: /dev/sda 
-         Mount Points: None
-         Boot Volume: Primary and Secondary
-         Logical Drive Label: SAS-R1-900
-         Mirror Group 1:
-            physicaldrive 1I:1:1 (port 1I:box 1:bay 1, SAS HDD, 900 GB, OK)
-         Mirror Group 2:
-            physicaldrive 1I:1:2 (port 1I:box 1:bay 2, SAS HDD, 900 GB, OK)
-         Drive Type: Data
-         LD Acceleration Method: Controller Cache
-
-
-   Array B
-
-      Logical Drive: 3
-         Size: 931.48 GB
-         Fault Tolerance: 0
-         Heads: 255
-         Sectors Per Track: 32
-         Cylinders: 65535
-         Strip Size: 256 KB
-         Full Stripe Size: 256 KB
-         Status: OK
-         Caching:  Enabled
-         Unique Identifier: 600508B1001C794A1E4BCEBA3072A0C0
-         Disk Name: /dev/sdc 
-         Mount Points: 931.4 GiB Partition   1 /mnt/pve/local-backup
-         Disk Partition Information
-            Partition   1: Basic, 931.4 GiB, /mnt/pve/local-backup
-         Logical Drive Label: SATA-1TB
-         Drive Type: Data
-         LD Acceleration Method: Controller Cache
-
-
-```ssacli ctrl all show config```
-   Array A (SAS, Unused Space: 0  MB)
-
-      logicaldrive 1 (838.33 GB, RAID 1, OK)
-
-      physicaldrive 1I:1:1 (port 1I:box 1:bay 1, SAS HDD, 900 GB, OK)
-      physicaldrive 1I:1:2 (port 1I:box 1:bay 2, SAS HDD, 900 GB, OK)
-
-   Array B (SATA, Unused Space: 0  MB)
-
-      logicaldrive 3 (931.48 GB, RAID 0, OK)
-
-      physicaldrive 2I:1:5 (port 2I:box 1:bay 5, SATA HDD, 1 TB, OK)
-
-   Unassigned
-
-      physicaldrive 1I:1:3 (port 1I:box 1:bay 3, SATA HDD, 500 GB, OK)
-      physicaldrive 1I:1:4 (port 1I:box 1:bay 4, SATA HDD, 500 GB, OK)
-      physicaldrive 2I:1:7 (port 2I:box 1:bay 7, SATA HDD, 1 TB, OK)
-
-
-```ssacli ctrl slot=0 ld 555 delete```
-
-
-
 
 
 ## Using the `ssacli` tool
@@ -262,4 +185,82 @@ Important: Because physical drive write cache is not battery-backed, you could l
 **Erase Physical Drive (controller slot 0, physical disk port 1I:box 1:bay 1)**  
 
 	ssacli ctrl slot=0 pd 1I:1:1 modify erase
+
+## Examples
+```ssacli ctrl slot=0 ld all show detail```
+
+Smart Array P420i in Slot 0 (Embedded)
+
+   Array A
+
+      Logical Drive: 1
+         Size: 838.33 GB
+         Fault Tolerance: 1
+         Heads: 255
+         Sectors Per Track: 32
+         Cylinders: 65535
+         Strip Size: 256 KB
+         Full Stripe Size: 256 KB
+         Status: OK
+         Unrecoverable Media Errors: None
+         Caching:  Enabled
+         Unique Identifier: 600508B1001CD326DDB697BAB5900BC9
+         Disk Name: /dev/sda 
+         Mount Points: None
+         Boot Volume: Primary and Secondary
+         Logical Drive Label: SAS-R1-900
+         Mirror Group 1:
+            physicaldrive 1I:1:1 (port 1I:box 1:bay 1, SAS HDD, 900 GB, OK)
+         Mirror Group 2:
+            physicaldrive 1I:1:2 (port 1I:box 1:bay 2, SAS HDD, 900 GB, OK)
+         Drive Type: Data
+         LD Acceleration Method: Controller Cache
+
+
+   Array B
+
+      Logical Drive: 3
+         Size: 931.48 GB
+         Fault Tolerance: 0
+         Heads: 255
+         Sectors Per Track: 32
+         Cylinders: 65535
+         Strip Size: 256 KB
+         Full Stripe Size: 256 KB
+         Status: OK
+         Caching:  Enabled
+         Unique Identifier: 600508B1001C794A1E4BCEBA3072A0C0
+         Disk Name: /dev/sdc 
+         Mount Points: 931.4 GiB Partition   1 /mnt/pve/local-backup
+         Disk Partition Information
+            Partition   1: Basic, 931.4 GiB, /mnt/pve/local-backup
+         Logical Drive Label: SATA-1TB
+         Drive Type: Data
+         LD Acceleration Method: Controller Cache
+
+
+```ssacli ctrl all show config```
+   Array A (SAS, Unused Space: 0  MB)
+
+      logicaldrive 1 (838.33 GB, RAID 1, OK)
+
+      physicaldrive 1I:1:1 (port 1I:box 1:bay 1, SAS HDD, 900 GB, OK)
+      physicaldrive 1I:1:2 (port 1I:box 1:bay 2, SAS HDD, 900 GB, OK)
+
+   Array B (SATA, Unused Space: 0  MB)
+
+      logicaldrive 3 (931.48 GB, RAID 0, OK)
+
+      physicaldrive 2I:1:5 (port 2I:box 1:bay 5, SATA HDD, 1 TB, OK)
+
+   Unassigned
+
+      physicaldrive 1I:1:3 (port 1I:box 1:bay 3, SATA HDD, 500 GB, OK)
+      physicaldrive 1I:1:4 (port 1I:box 1:bay 4, SATA HDD, 500 GB, OK)
+      physicaldrive 2I:1:7 (port 2I:box 1:bay 7, SATA HDD, 1 TB, OK)
+
+
+```ssacli ctrl slot=0 ld 555 delete```
+
+
 
