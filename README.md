@@ -1,4 +1,24 @@
-ssacli ctrl slot=0 ld all show detail
+# This playbook install necessary tools for HPE Proliant servers. 
+
+``` ansible-playbook --diff --inventory hosts --private-key ~/.ssh/id_rsa --user ansible  hp-mcp-playbook.yml --limit  proliant-servers --diff ```
+
+## hp-health provides tools:
+ * hpasmcli
+ * hpbootcfg
+ * hplog
+ * hpuid
+
+```
+ hpasmcli -s "SHOW SERVER"
+ hpasmcli -s "SHOW DIMM" | grep -E "Module|Size|Status"
+ hpasmcli -s "SHOW TEMP; SHOW FAN"
+ hpasmcli -s "SHOW IML" | more
+ hplog -t
+ hplog -f
+ hplog -p
+```
+
+```ssacli ctrl slot=0 ld all show detail```
 
 Smart Array P420i in Slot 0 (Embedded)
 
@@ -50,7 +70,7 @@ Smart Array P420i in Slot 0 (Embedded)
          LD Acceleration Method: Controller Cache
 
 
-ssacli ctrl all show config
+```ssacli ctrl all show config```
    Array A (SAS, Unused Space: 0  MB)
 
       logicaldrive 1 (838.33 GB, RAID 1, OK)
@@ -71,7 +91,7 @@ ssacli ctrl all show config
       physicaldrive 2I:1:7 (port 2I:box 1:bay 7, SATA HDD, 1 TB, OK)
 
 
-ssacli ctrl slot=0 ld 555 delete
+```ssacli ctrl slot=0 ld 555 delete```
 
 
 
