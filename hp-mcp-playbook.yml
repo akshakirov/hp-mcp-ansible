@@ -28,7 +28,7 @@
         group: root
         mode: '0644'
       # yamllint disable-line rule:line-length
-      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'bullseye'
+      when: ansible_distribution == 'Debian' and ansible_distribution_release == 'bookworm'
 
     - name: Latest HPE Management Component Pack repo for the exact OS release
       ansible.builtin.apt_repository:
