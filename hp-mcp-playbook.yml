@@ -30,6 +30,12 @@
       # yamllint disable-line rule:line-length
       when: ansible_distribution == 'Debian' and ansible_distribution_release == 'bookworm'
 
+    - name: Add an apt LINBIT Package and Repository Signing Key (2023)
+      ansible.builtin.apt_key:
+        keyserver: keyserver.ubuntu.com
+        id: FC05A31DB826FE48
+      when: ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'
+
     - name: Latest HPE Management Component Pack repo for the exact OS release
       ansible.builtin.apt_repository:
         # yamllint disable-line rule:line-length
